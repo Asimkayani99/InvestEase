@@ -1,0 +1,47 @@
+@page "/"
+@inject EventService Events
+@inject UserSessionService Session
+
+<PageTitle>EventEase — Home</PageTitle>
+
+<h1>Welcome to EventEase</h1>
+<p class="lead">A small Blazor app to create, browse and manage events.</p>
+
+<div class="row g-3 my-3">
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            <h2>@Events.GetAll().Count</h2><p class="text-muted mb-0">Events</p>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            <h2>@Events.TotalCapacity</h2><p class="text-muted mb-0">Total seats</p>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            <h2 class="text-success">@Events.TotalRegistered</h2><p class="text-muted mb-0">Registered attendees</p>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm"><div class="card-body">
+            @if (Session.IsLoggedIn)
+            {
+                <h2 class="fs-4">Hello, @Session.CurrentUser!.FullName</h2>
+                <p class="text-muted mb-0">Signed in since @Session.LoginTime?.ToString("hh:mm tt")</p>
+            }
+            else
+            {
+                <h2 class="fs-4">Guest</h2>
+                <p class="text-muted mb-0"><a href="/register">Register</a> to start your session</p>
+            }
+        </div></div>
+    </div>
+</div>
+
+<h3>What you can do here</h3>
+<ul>
+    <li><a href="/events">Events</a> — add events with the live Event Card form and manage the list.</li>
+    <li><a href="/register">Register</a> — create your account (validated form) and start a user session.</li>
+    <li><a href="/attendance">Attendance Tracker</a> — mark attendance at events and see your record.</li>
+</ul>
