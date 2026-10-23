@@ -1,0 +1,68 @@
+@page "/register"
+@inject UserSessionService Session
+@inject NavigationManager Nav
+
+<PageTitle>EventEase — Register</PageTitle>
+
+<h1>Create your account</h1>
+
+@if (Session.IsLoggedIn)
+{
+    <div class="alert alert-success">
+        You are registered and signed in as <strong>@Session.CurrentUser!.FullName</strong>
+        (@Session.CurrentUser.Email) — joining as: @Session.CurrentUser.Interest.
+    </div>
+    <button class="btn btn-outline-danger" @onclick="Logout">Log out</button>
+    <a class="btn btn-primary ms-2" href="/attendance">Go to Attendance Tracker</a>
+}
+else
+{
+    <p class="text-muted">Every field is validated — try submitting with errors to see
+    the data-annotation validation messages.</p>
+
+    <EditForm Model="model" OnValidSubmit="HandleRegister">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        <div class="mb-2 col-md-6">
+            <label class="form-label">Full name</label>
+            <InputText class="form-control" @bind-Value="model.FullName" />
+            <ValidationMessage For="() => model.FullName" class="text-danger" />
+        </div>
+        <div class="mb-2 col-md-6">
+            <label class="form-label">Email</label>
+            <InputText class="form-control" @bind-Value="model.Email" />
+            <ValidationMessage For="() => model.Email" class="text-danger" />
+        </div>
+        <div class="mb-2 col-md-6">
+            <label class="form-label">Password (min 8 characters)</label>
+            <InputText type="password" class="form-control" @bind-Value="model.Password" />
+            <ValidationMessage For="() => model.Password" class="text-danger" />
+        </div>
+        <div class="mb-2 col-md-6">
+            <label class="form-label">Confirm password</label>
+            <InputText type="password" class="form-control" @bind-Value="model.ConfirmPassword" />
+            <ValidationMessage For="() => model.ConfirmPassword" class="text-danger" />
+        </div>
+        <div class="mb-3 col-md-6">
+            <label class="form-label">I am joining as</label>
+            <InputSelect class="form-select" @bind-Value="model.Interest">
+                <option>Attendee</option><option>Organizer</option>
+                <option>Volunteer</option><option>Speaker</option>
+            </InputSelect>
+        </div>
+        <button class="btn btn-primary" type="submit">Register</button>
+    </EditForm>
+}
+
+@code {
+    private RegistrationModel model = new();
+
+    private void HandleRegister()
+    {
+        Session.Register(model);   // state management: the session now holds the user
+        model = new RegistrationModel();
+    }
+
+    private void Logout() => Session.Logout();
+}
