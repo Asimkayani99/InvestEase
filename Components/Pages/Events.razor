@@ -1,0 +1,90 @@
+@page "/events"
+@inject EventService Service
+
+<PageTitle>EventEase — Events</PageTitle>
+
+<h1>Events</h1>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <h4>Add a new event</h4>
+        <p class="text-muted">Type in the form — the card on the right updates live.
+        That is two-way data binding (<code>@@bind-Value</code>) at work.</p>
+
+        <EditForm Model="draft" OnValidSubmit="AddEvent">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            <div class="mb-2">
+                <label class="form-label">Title</label>
+                <InputText class="form-control" @bind-Value="draft.Title" />
+                <ValidationMessage For="() => draft.Title" class="text-danger" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Category</label>
+                <InputSelect class="form-select" @bind-Value="draft.Category">
+                    <option>Workshop</option><option>Seminar</option><option>Conference</option>
+                    <option>Meetup</option><option>Webinar</option><option>Social</option>
+                </InputSelect>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Date</label>
+                <InputDate class="form-control" @bind-Value="draft.Date" />
+                <ValidationMessage For="() => draft.Date" class="text-danger" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Location</label>
+                <InputText class="form-control" @bind-Value="draft.Location" />
+                <ValidationMessage For="() => draft.Location" class="text-danger" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Capacity (total seats)</label>
+                <InputNumber class="form-control" @bind-Value="draft.Capacity" />
+                <ValidationMessage For="() => draft.Capacity" class="text-danger" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Registered attendees</label>
+                <InputNumber class="form-control" @bind-Value="draft.RegisteredAttendees" />
+                <ValidationMessage For="() => draft.RegisteredAttendees" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description (optional)</label>
+                <InputText class="form-control" @bind-Value="draft.Description" />
+            </div>
+            <button class="btn btn-primary" type="submit">Add event</button>
+            @if (savedMessage is not null)
+            {
+                <span class="text-success ms-2">@savedMessage</span>
+            }
+        </EditForm>
+    </div>
+
+    <div class="col-lg-7">
+        <h4>Live preview</h4>
+        <EventCard Event="draft" ShowActions="false" />
+
+        <h4 class="mt-4">All events (@Service.GetAll().Count — @Service.TotalRegistered registered of @Service.TotalCapacity seats)</h4>
+        <div class="row g-3">
+            @foreach (var item in Service.GetAll())
+            {
+                <div class="col-md-6" @key="item.Id">
+                    <EventCard Event="item" OnDelete="DeleteEvent" />
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private Event draft = new();
+    private string? savedMessage;
+
+    private void AddEvent()
+    {
+        Service.Add(draft);
+        savedMessage = $"'{draft.Title}' added to the events list.";
+        draft = new Event();
+    }
+
+    private void DeleteEvent(int id) => Service.Delete(id);
+}
