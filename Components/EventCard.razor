@@ -1,0 +1,39 @@
+@* EventCard — reusable component that displays one Event.
+   The parent passes the Event as a [Parameter]; changes to the object are
+   reflected immediately because Blazor re-renders on state change (this is the
+   same object the Add form edits with @bind-Value, which gives live two-way
+   binding between the form fields and this card preview). *@
+
+<div class="card shadow-sm h-100">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <h5 class="card-title mb-1">@Event.Title</h5>
+            <span class="badge bg-primary">@Event.Category</span>
+        </div>
+        <p class="card-text mb-1">Date: <strong>@Event.Date.ToString("dd MMM yyyy")</strong></p>
+        <p class="card-text mb-1">Location: <strong>@Event.Location</strong></p>
+        <p class="card-text mb-1">Registered: <strong>@Event.RegisteredAttendees</strong> of @Event.Capacity seats</p>
+        <p class="card-text mb-2">Seats left: <strong class="@(Event.SeatsLeft > 0 ? "text-success" : "text-danger")">@Event.SeatsLeft</strong></p>
+        @if (!string.IsNullOrWhiteSpace(Event.Description))
+        {
+            <p class="card-text"><em>@Event.Description</em></p>
+        }
+        @if (ShowActions)
+        {
+            <a class="btn btn-sm btn-outline-secondary me-2" href="/events/@Event.Id">Details</a>
+            <button class="btn btn-sm btn-outline-danger" @onclick="() => OnDelete.InvokeAsync(Event.Id)">Delete</button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public Event Event { get; set; } = default!;
+
+    /// <summary>Raised when the user clicks Delete; the parent owns the data.</summary>
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+
+    [Parameter]
+    public bool ShowActions { get; set; } = true;
+}
