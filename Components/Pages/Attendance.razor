@@ -1,0 +1,77 @@
+@page "/attendance"
+@inject AttendanceService Tracker
+@inject UserSessionService Session
+
+<PageTitle>EventEase — Attendance Tracker</PageTitle>
+
+<h1>Attendance Tracker</h1>
+
+@if (Session.IsLoggedIn)
+{
+    <div class="alert alert-info">Marking attendance for <strong>@Session.CurrentUser!.FullName</strong>.</div>
+}
+else
+{
+    <div class="alert alert-warning">
+        You are browsing as <strong>Guest</strong>. <a href="/register">Register</a> so the
+        tracker knows who is checking in.
+    </div>
+}
+
+<div class="row g-2 align-items-end mb-3">
+    <div class="col-md-3">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-control" @bind="newRecord.Date" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Event</label>
+        <input class="form-control" @bind="newRecord.EventName" placeholder="Event name" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Status</label>
+        <select class="form-select" @bind="newRecord.Status">
+            <option>Present</option><option>Absent</option><option>Leave</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Note (optional)</label>
+        <input class="form-control" @bind="newRecord.Note" placeholder="Any note?" />
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary w-100" @onclick="AddRecord">Mark</button>
+    </div>
+</div>
+
+<p>
+    Total entries: <strong>@Tracker.GetAll().Count</strong> —
+    Attendance: <strong>@Tracker.AttendancePercentage%</strong> present
+</p>
+
+<table class="table table-striped">
+    <thead><tr><th>Date</th><th>Event</th><th>Status</th><th>Note</th></tr></thead>
+    <tbody>
+        @foreach (var r in Tracker.GetAll())
+        {
+            <tr @key="r.Id">
+                <td>@r.Date.ToString("dd MMM yyyy")</td>
+                <td>@r.EventName</td>
+                <td>
+                    <span class="badge @(r.Status == "Present" ? "bg-success" : r.Status == "Leave" ? "bg-warning text-dark" : "bg-danger")">
+                        @r.Status
+                    </span>
+                </td>
+                <td>@r.Note</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private AttendanceRecord newRecord = new();
+
+    private void AddRecord()
+    {
+        Tracker.Add(newRecord);
+        newRecord = new AttendanceRecord();
+    }
+}
