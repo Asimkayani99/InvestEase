@@ -1,0 +1,55 @@
+@inject UserSessionService Session
+@implements IDisposable
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">EventEase</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="events">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Events
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="register">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Register
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="attendance">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Attendance
+            </NavLink>
+        </div>
+
+        <div class="px-3 mt-4 text-white-50 small">
+            @if (Session.IsLoggedIn)
+            {
+                <div>Signed in as<br /><strong class="text-white">@Session.CurrentUser!.FullName</strong></div>
+            }
+            else
+            {
+                <div>Browsing as Guest</div>
+            }
+        </div>
+    </nav>
+</div>
+
+@code {
+    protected override void OnInitialized() => Session.OnChange += Refresh;
+    private void Refresh() => InvokeAsync(StateHasChanged);
+    public void Dispose() => Session.OnChange -= Refresh;
+}
